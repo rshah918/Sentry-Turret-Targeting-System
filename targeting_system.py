@@ -12,8 +12,20 @@ Workflow:
     5: Send motor coordinates to the Arduino motor controller
     6: Fire turret
 '''
-def load_network(protobuf_path, meta_path):
-    '''load neural net from protobuf and meta file'''
+def load_network(experimental_detector=False):
+    '''Loads neural net from protobuf and meta file
+        Params: experimental_detector is a smaller neural net with a custom modified
+        architecture, ~33% faster (~30FPS on CPU)
+        Default neural net is an unmodified tiny-yolo architecture, ~21 FPS on CPU
+        Returns: initialized neural net
+    '''
+    #
+    if experimental_detector == True:
+        protobuf_path = "built_graph/super-tiny-yolo-human.pb"
+        meta_path = "built_graph/super-tiny-yolo-human.meta"
+    else:
+        protobuf_path = "built_graph/tiny-yolo-human.pb"
+        meta_path = "built_graph/tiny-yolo-human.meta"
     options = {"pbLoad": protobuf_path, "metaLoad": meta_path, "threshold": 0.1}
     tfnet = TFNet(options)
     return tfnet
@@ -90,7 +102,7 @@ def aim_turret(motor_deltas=[]):
             tilt = motor_deltas[1]
             ser.write(('x'+str(int(pan))+'y'+str(int(tilt))).encode('ascii'))
 
-tfnet = load_network("built_graph/tiny-yolo-human.pb", "built_graph/tiny-yolo-human.meta")
+tfnet = load_network(experimental_detector=False)
 cap = cv2.VideoCapture(0)
 curr = time.time()
 num_frames = 0
