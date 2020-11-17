@@ -2,6 +2,7 @@ from darkflow.net.build import TFNet
 import cv2
 import time
 import math
+import serial
 '''
 Targeting Software for our CSCE-462 Sentry Turret
 Workflow:
@@ -45,7 +46,7 @@ def draw_bounding_box(frame, result):
         for i in range(len(result)):
             img = cv2.rectangle(frame, (result[i]['topleft']['x'],result[i]['topleft']['y']), (result[i]['bottomright']['x'], result[i]['bottomright']['y']), (255,0,0), 2)
 
-def calculate_pixel_deltas(frame, result):
+def calculate_pixel_deltas(frame, result, correction_threshold = 0):
     '''For each BB in result[], calculate how many pixels the center of each BB is
         from the center of the image, and return them in an array.
     Returns: 1D array of [deltaX,deltaY] pairs'''
@@ -65,7 +66,12 @@ def calculate_pixel_deltas(frame, result):
                 #negative delta means target is offset below/left of center
             deltaX = BBcenterX - imageCenterX
             deltaY = imageCenterY - BBcenterY
-            deltas.append([deltaX, deltaY])
+            #Set delta to 0 if object is "close enough" to the center to reduce jitter
+            if abs(deltaX) < correction_threshold:
+                deltaX = 0
+            if abs(deltaY) < correction_threshold:
+                deltaY = 0
+            deltas.append([deltaX, deltaY, BBwidth, BBheight])
             print(BBcenterX, BBcenterY,
              imageCenterX, imageCenterY, deltaX, deltaY)
     return deltas
@@ -75,12 +81,18 @@ def select_target(pixel_deltas=[]):
         Selects the closest human to the center of the frame as the target'''
     selected_target = []
     if(len(pixel_deltas) > 0):
+        largest_target = 0
         min_distance = 999
         for target in pixel_deltas:
             deltaX = target[0]
             deltaY = target[1]
+            targetWidth = target[2]
+            targetHeight = target[2]
+            targetSize = targetWidth*targetHeight
             euclideanDistance = math.sqrt((deltaX**2)+(deltaY**2))
-            if euclideanDistance < min_distance:
+            '''if euclideanDistance < min_distance:
+                selected_target = [deltaX, deltaY]'''
+            if targetSize > largest_target:
                 selected_target = [deltaX, deltaY]
     return selected_target
 
@@ -109,7 +121,7 @@ def aim_turret(motor_deltas=[]):
             tilt = motor_deltas[1]
             ser.write(('x'+str(int(pan))+'y'+str(int(tilt))).encode('ascii'))
 
-tfnet = load_network(experimental_detector=False)
+tfnet = load_network(experimental_detector=True)
 cap = cv2.VideoCapture(0)
 curr = time.time()
 num_frames = 0
@@ -131,7 +143,8 @@ while True:
     #draw bounding boxes
     draw_bounding_box(frame,result)
     #calculate deltas
-    deltas = calculate_pixel_deltas(frame, result)
+    correction_threshold = 100
+    deltas = calculate_pixel_deltas(frame, result, correction_threshold)
     #select target
     target = select_target(deltas)
     #calculate motor rotation coordinates
