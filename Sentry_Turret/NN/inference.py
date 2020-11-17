@@ -29,5 +29,5 @@ class InferenceTPU:
         objs = utils.get_output(self.interpreter, score_threshold=.65, top_k=3)
         image = utils.append_objs_to_img(image,objs,None)
         # calculate the frame deltas
-        deltas = utils.calculate_pixel_deltas(image,objs)
+        deltas = utils.calculate_pixel_deltas(image,objs,100)
         return (deltas,image)

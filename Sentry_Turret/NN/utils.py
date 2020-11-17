@@ -88,7 +88,7 @@ def append_objs_to_img(cv2_im, objs, labels):
                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 2)
     return cv2_im
 
-def calculate_pixel_deltas(frame, result):
+def calculate_pixel_deltas(frame, result,correction_threshold=0):
     '''For each BB in result[], calculate how many pixels the center of each BB is
         from the center of the image, and return them in an array.
     Returns: 1D array of [deltaX,deltaY] pairs'''
@@ -110,7 +110,11 @@ def calculate_pixel_deltas(frame, result):
             #negative delta means target is offset below/left of center
         deltaX = BBcenterX - imageCenterX
         deltaY = imageCenterY - BBcenterY
-        deltas.append([deltaX, deltaY])
+        if abs(deltaX) < correction_threshold:
+                deltaX = 0
+        if abs(deltaY) < correction_threshold:
+            deltaY = 0
+        deltas.append([deltaX, deltaY, BBwidth, BBheight])
         print(BBcenterX, BBcenterY,
-        imageCenterX, imageCenterY, deltaX, deltaY)
+            imageCenterX, imageCenterY, deltaX, deltaY)
     return deltas

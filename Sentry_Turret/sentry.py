@@ -19,15 +19,21 @@ class Sentry():
         self.cap = cv2.VideoCapture(0)
     def select_target(self,pixel_deltas=[]):
         '''Calculate the Euclidean Distance between the image center and each detected human.
-            Selects the closest human to the center of the frame as the target'''
+        Selects the closest human to the center of the frame as the target'''
         selected_target = []
         if(len(pixel_deltas) > 0):
+            largest_target = 0
             min_distance = 999
             for target in pixel_deltas:
                 deltaX = target[0]
                 deltaY = target[1]
+                targetWidth = target[2]
+                targetHeight = target[2]
+                targetSize = targetWidth*targetHeight
                 euclideanDistance = math.sqrt((deltaX**2)+(deltaY**2))
-                if euclideanDistance < min_distance:
+                '''if euclideanDistance < min_distance:
+                    selected_target = [deltaX, deltaY]'''
+                if targetSize > largest_target:
                     selected_target = [deltaX, deltaY]
         return selected_target
     def start(self):
