@@ -37,7 +37,7 @@ class TurretController:
     def send_angles_from_deltas(self,deltaX,deltaY):
         #calculate the angles from pixel deltas
         sensitivityX =0.1
-        sensitivityY =0.1
+        sensitivityY =0.2
         angle_delta_x = sensitivityX*abs(deltaX/(2*math.tan(30)))
         angle_delta_y = sensitivityY*abs(deltaY/(2*math.tan(30)))
         pan = self.pan

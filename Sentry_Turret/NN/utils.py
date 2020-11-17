@@ -74,7 +74,7 @@ def get_output(interpreter, score_threshold, top_k, image_scale=1.0):
                         xmax=np.minimum(1.0, xmax),
                         ymax=np.minimum(1.0, ymax)))
 
-    return [make(i) for i in range(top_k) if scores[i] >= score_threshold and class_ids[0]==0]
+    return [make(i) for i in range(top_k) if scores[i] >= score_threshold and class_ids[i]==0]
 def append_objs_to_img(cv2_im, objs, labels):
     height, width, channels = cv2_im.shape
     for obj in objs:

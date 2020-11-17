@@ -34,6 +34,7 @@ class Sentry():
                 '''if euclideanDistance < min_distance:
                     selected_target = [deltaX, deltaY]'''
                 if targetSize > largest_target:
+                    largest_target = targetSize
                     selected_target = [deltaX, deltaY]
         return selected_target
     def start(self):
