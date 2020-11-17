@@ -89,9 +89,16 @@ def calculate_motor_deltas(pixel_deltas=[]):
             Returns: [pan,tilt]'''
         motor_deltas = []
         if len(pixel_deltas) > 0:
-            '''Mark, enter the pixel delta->motor delta conversion code here
-            return a 1D array: [pan,tilt]
-            '''
+                angle_delta_x = x_delta/(2*math.tan(30))
+                angle_delta_y = y_delta/(2*math.tan(30))
+                if (bbX+bbW/2) > (frame_width/2):
+                    pan = pan + 15*angle_delta_x
+                elif (bbX+bbW/2) < (frame_width/2):
+                    pan = pan - 15*angle_delta_x
+                if (bbY+bbH/2) > (frame_height/2):
+                    tilt = tilt - 15*angle_delta_y
+                elif (bbY+bbH/2) < (frame_height/2):
+                    tilt = tilt + 15*angle_delta_y
             pass
         return motor_deltas
 
