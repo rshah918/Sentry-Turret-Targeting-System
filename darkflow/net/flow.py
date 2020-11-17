@@ -20,7 +20,7 @@ def _save_ckpt(self, step, loss_profile):
 
     profile = file.format(model, step, '.profile')
     profile = os.path.join(self.FLAGS.backup, profile)
-    with open(profile, 'wb') as profile_ckpt: 
+    with open(profile, 'wb') as profile_ckpt:
         pickle.dump(loss_profile, profile_ckpt)
 
     ckpt = file.format(model, step, '')
@@ -43,7 +43,7 @@ def train(self):
         ))
 
         feed_dict = {
-            loss_ph[key]: datum[key] 
+            loss_ph[key]: datum[key]
                 for key in loss_ph }
         feed_dict[self.inp] = x_batch
         feed_dict.update(self.feed)
@@ -82,6 +82,7 @@ def return_predict(self, im):
     feed_dict = {self.inp : this_inp}
 
     out = self.sess.run(self.out, feed_dict)[0]
+    
     boxes = self.framework.findboxes(out)
     threshold = self.FLAGS.threshold
     boxesInfo = list()
@@ -126,7 +127,7 @@ def predict(self):
                 os.path.join(inp_path, inp)), 0)), this_batch)
 
         # Feed to the net
-        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}    
+        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}
         self.say('Forwarding {} inputs ...'.format(len(inp_feed)))
         start = time.time()
         out = self.sess.run(self.out, feed_dict)
