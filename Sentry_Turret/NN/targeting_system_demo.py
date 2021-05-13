@@ -111,7 +111,6 @@ def calculate_motor_deltas(pixel_deltas=[]):
                     tilt = tilt - 15*angle_delta_y
                 elif (bbY+bbH/2) < (frame_height/2):
                     tilt = tilt + 15*angle_delta_y
-            pass
         return motor_deltas
 
 def aim_turret(motor_deltas=[]):
@@ -148,9 +147,9 @@ while True:
     #select target
     target = select_target(deltas)
     #calculate motor rotation coordinates
-    motor_deltas = calculate_motor_deltas(target)
+    #motor_deltas = calculate_motor_deltas(target)
     #aim gun
-    aim_turret(motor_deltas)
+    #aim_turret(motor_deltas)
     #FPS tracking
     num_frames += 1
     now = time.time()
